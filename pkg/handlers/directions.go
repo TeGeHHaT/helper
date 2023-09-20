@@ -40,7 +40,6 @@ func GetDirection(c *gin.Context) {
 	for rows.Next() {
 		if err := rows.Scan(&directionJSON); err != nil {
 			c.JSON(http.StatusInternalServerError, err.Error())
-			log.Println("Ошибка в rows")
 			log.Println(err)
 			return
 		}
@@ -58,10 +57,23 @@ func UpdateDirection(c *gin.Context) {
 		return
 	}
 
-	query := fmt.Sprintf("SELECT * FROM public.fn_direction_get('{\"id\": %v}')", id)
+	query := fmt.Sprintf("SELECT * FROM public.fn_direction_ins_upd('{\"id\": %v, \"name\": %v, \"code\": %v}')",
+		direction.Id,
+		direction.Name,
+		direction.Code,
+	)
 
 	rows, err := database.DB.Query(query)
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	var directionJSON string
+	for rows.Next() {
+		if err := rows.Scan(&directionJSON); err != nil {
+			c.JSON(http.StatusInternalServerError, err.Error())
+			log.Println(err)
+			return
+		}
 	}
 }
