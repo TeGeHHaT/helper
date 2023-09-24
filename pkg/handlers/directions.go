@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/tegehhat/helper/models"
 	"github.com/tegehhat/helper/pkg/database"
 )
 
@@ -18,10 +19,6 @@ type Direction struct {
 	IsDisabled bool   `json:"is_disabled"`
 }
 
-type DirectionParams struct {
-	Id int `json:"id"`
-}
-
 func GetDirection(c *gin.Context) {
 	id := c.Param("id")
 	idInt, err := strconv.Atoi(id)
@@ -29,7 +26,7 @@ func GetDirection(c *gin.Context) {
 		log.Println(err.Error())
 	}
 
-	directionParams := DirectionParams{Id: idInt}
+	directionParams := models.DirectionGetParams{Id: idInt}
 
 	jsonParams, err := json.Marshal(directionParams)
 	if err != nil {
