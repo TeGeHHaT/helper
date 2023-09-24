@@ -11,39 +11,39 @@ import (
 	"github.com/tegehhat/helper/pkg/database"
 )
 
-type Direction struct {
-	Id         int    `json:"id"`
-	Code       string `json:"code"`
-	Name       string `json:"name"`
-	Color      string `json:"color"`
-	IsDisabled bool   `json:"is_disabled"`
-}
-
 func GetDirection(c *gin.Context) {
 	id := c.Param("id")
 	idInt, err := strconv.Atoi(id)
 	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
 		log.Println(err.Error())
+		return
 	}
 
 	directionParams := models.DirectionGetParams{Id: idInt}
 
 	jsonParams, err := json.Marshal(directionParams)
 	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
 		log.Println(err.Error())
+		return
 	}
 
 	var buf []byte
 	err = database.DB.QueryRow(`SELECT * FROM public.fn_direction_get($1::jsonb)`, string(jsonParams)).Scan(&buf)
 	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
 		log.Println(err.Error())
+		return
 	}
 
-	res := []Direction{}
+	res := []models.Direction{}
 
 	err = json.Unmarshal(buf, &res)
 	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
 		log.Println(err.Error())
+		return
 	}
 
 	c.JSON(http.StatusOK, res)
