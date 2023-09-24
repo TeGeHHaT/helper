@@ -1,6 +1,6 @@
 module github.com/tegehhat/helper
 
-go 1.17
+go 1.21.0
 
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
