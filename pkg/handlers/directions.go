@@ -57,6 +57,8 @@ func UpdateDirection(c *gin.Context) {
 		return
 	}
 
+	log.Println(direction)
+
 	query := fmt.Sprintf("SELECT * FROM public.fn_direction_ins_upd('{\"id\": %v, \"name\": %v, \"code\": %v}')",
 		direction.Id,
 		direction.Name,
@@ -76,4 +78,6 @@ func UpdateDirection(c *gin.Context) {
 			return
 		}
 	}
+
+	c.JSON(http.StatusOK, directionJSON)
 }

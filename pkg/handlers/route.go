@@ -13,7 +13,7 @@ func GetRoute() *gin.Engine {
 
 	r.GET("/direction", GetDirection)
 	r.GET("/direction/:id", GetDirection)
-	r.PATCH("/direction", UpdateDirection)
+	r.PATCH("/direction/:id", UpdateDirection)
 
 	return r
 }
