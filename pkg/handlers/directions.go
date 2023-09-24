@@ -15,9 +15,7 @@ func GetDirection(c *gin.Context) {
 	id := c.Param("id")
 	idInt, err := strconv.Atoi(id)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err)
 		log.Println(err.Error())
-		return
 	}
 
 	directionParams := models.DirectionGetParams{Id: idInt}

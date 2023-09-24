@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/tegehhat/helper/pkg/database"
-	"github.com/tegehhat/helper/pkg/handlers"
+	"github.com/tegehhat/helper/pkg/routes"
 )
 
 func Run() {
@@ -16,6 +16,6 @@ func Run() {
 	defer database.CloseConnect()
 
 	// Загружаем приложение
-	handlers.GetRoute().Run(":8083")
+	routes.GetRoute().Run(":8083")
 
 }
