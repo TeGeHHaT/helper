@@ -15,7 +15,7 @@ var DB *sql.DB
 func init() {
 	// Загрузка переменных окружения из файла .env
 	if err := godotenv.Load(); err != nil {
-		log.Panic(err)
+		log.Fatal(err)
 	}
 }
 
