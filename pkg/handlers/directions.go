@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"fmt"
+	"encoding/json"
 	"log"
 	"net/http"
 	"strconv"
@@ -18,66 +18,41 @@ type Direction struct {
 	IsDisabled bool   `json:"is_disabled"`
 }
 
+type DirectionParams struct {
+	Id int `json:"id"`
+}
+
 func GetDirection(c *gin.Context) {
-	var id int
-	if c.Params.ByName("id") != "" {
-		n, err := strconv.Atoi(c.Params.ByName("id"))
-		if err != nil {
-			c.String(http.StatusBadRequest, err.Error())
-			return
-		}
-		id = n
-	}
-
-	query := fmt.Sprintf("SELECT * FROM public.fn_direction_get('{\"id\": %v}')", id)
-
-	rows, err := database.DB.Query(query)
+	id := c.Param("id")
+	idInt, err := strconv.Atoi(id)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err.Error())
 	}
 
-	var directionJSON string
-	for rows.Next() {
-		if err := rows.Scan(&directionJSON); err != nil {
-			c.JSON(http.StatusInternalServerError, err.Error())
-			log.Println(err)
-			return
-		}
+	directionParams := DirectionParams{Id: idInt}
+
+	jsonParams, err := json.Marshal(directionParams)
+	if err != nil {
+		log.Println(err.Error())
 	}
 
-	c.JSON(http.StatusOK, directionJSON)
+	var buf []byte
+	err = database.DB.QueryRow(`SELECT * FROM public.fn_direction_get($1::jsonb)`, string(jsonParams)).Scan(&buf)
+	if err != nil {
+		log.Println(err.Error())
+	}
+
+	res := []Direction{}
+
+	err = json.Unmarshal(buf, &res)
+	if err != nil {
+		log.Println(err.Error())
+	}
+
+	c.JSON(http.StatusOK, res)
 }
 
 func UpdateDirection(c *gin.Context) {
-	var direction Direction
-
-	if err := c.BindJSON(&direction); err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
-		log.Println(err)
-		return
-	}
-
-	log.Println(direction)
-
-	query := fmt.Sprintf("SELECT * FROM public.fn_direction_ins_upd('{\"id\": %v, \"name\": %v, \"code\": %v}')",
-		direction.Id,
-		direction.Name,
-		direction.Code,
-	)
-
-	rows, err := database.DB.Query(query)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	var directionJSON string
-	for rows.Next() {
-		if err := rows.Scan(&directionJSON); err != nil {
-			c.JSON(http.StatusInternalServerError, err.Error())
-			log.Println(err)
-			return
-		}
-	}
-
-	c.JSON(http.StatusOK, directionJSON)
+	test := `test`
+	c.JSON(http.StatusOK, test)
 }
