@@ -10,7 +10,7 @@ import (
 func GetRoute() *gin.Engine {
 	r := gin.Default()
 
-	r.GET("/login", testf)
+	r.POST("/login", handlers.Login)
 
 	r.GET("/direction", handlers.GetDirection)
 	r.GET("/direction/:id", handlers.GetDirection)
