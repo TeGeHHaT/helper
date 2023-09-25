@@ -45,6 +45,53 @@ func GetDirection(c *gin.Context) {
 }
 
 func UpdateDirection(c *gin.Context) {
-	test := `test`
-	c.JSON(http.StatusOK, test)
+	var directionInsUpdParams models.DirectionInsUpdParams
+
+	json.NewDecoder(c.Request.Body).Decode(&directionInsUpdParams)
+
+	jsonParams, err := json.Marshal(directionInsUpdParams)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		log.Println(err.Error())
+		return
+	}
+
+	var buf []byte
+	err = database.DB.QueryRow(`SELECT * FROM public.fn_direction_ins_upd($1::jsonb)`, string(jsonParams)).Scan(&buf)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		log.Println(err.Error())
+		return
+	}
+
+	res := models.Direction{}
+
+	err = json.Unmarshal(buf, &res)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		log.Println(err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, res)
+}
+
+func DeleteDirection(c *gin.Context) {
+	var directionDelParams models.DirectionDelParams
+
+	json.NewDecoder(c.Request.Body).Decode(&directionDelParams)
+
+	jsonParams, err := json.Marshal(directionDelParams)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		log.Println(err.Error())
+		return
+	}
+
+	database.DB.Exec(`SELECT * FROM public.fn_direction_del($1::jsonb)`, string(jsonParams))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		log.Println(err.Error())
+		return
+	}
 }

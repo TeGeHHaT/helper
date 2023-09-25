@@ -132,7 +132,7 @@ func createSession(userId int, c *gin.Context) (string, error) {
 func GetSession(token string) (*models.Session, error) {
 	var session models.Session
 
-	err := database.DB.QueryRow("SELECT token, user_name, created_at, expires_at FROM t_session WHERE token = $1", token).Scan(
+	err := database.DB.QueryRow("SELECT token, user_id, created_at, expires_at FROM t_session WHERE token = $1", token).Scan(
 		&session.Token,
 		&session.User,
 		&session.CreatedAt,

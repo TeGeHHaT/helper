@@ -11,3 +11,12 @@ type Direction struct {
 type DirectionGetParams struct {
 	Id int `json:"id"`
 }
+
+type DirectionInsUpdParams struct {
+	Id   int    `json:"id"`
+	Name string `json:"name"`
+}
+
+type DirectionDelParams struct {
+	Ids string `json:"ids"`
+}

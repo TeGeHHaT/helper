@@ -11,14 +11,17 @@ import (
 func GetRoute() *gin.Engine {
 	r := gin.Default()
 
+	//Авторизация
 	r.POST("/login", handlers.Login)
 	r.POST("/registration", handlers.Registation)
 
 	r.Use(middleware.RequireAuth())
 
+	//Направления
 	r.GET("/direction", handlers.GetDirection)
 	r.GET("/direction/:id", handlers.GetDirection)
-	r.PATCH("/direction/:id", handlers.UpdateDirection)
+	r.PATCH("/direction/", handlers.UpdateDirection)
+	r.DELETE("/direction/", handlers.DeleteDirection)
 
 	return r
 }
