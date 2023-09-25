@@ -15,6 +15,7 @@ import (
 	"github.com/tegehhat/helper/pkg/database"
 )
 
+// Регистрация /registration
 func Registation(c *gin.Context) {
 	var user models.UserAuth
 	json.NewDecoder(c.Request.Body).Decode(&user)
@@ -28,6 +29,7 @@ func Registation(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
+// Вход /login
 func Login(c *gin.Context) {
 	var user models.UserAuth
 	json.NewDecoder(c.Request.Body).Decode(&user)
@@ -48,6 +50,7 @@ func Login(c *gin.Context) {
 	c.JSON(http.StatusOK, token)
 }
 
+// Добавляем пользователя
 func addUser(u *models.UserAuth, c *gin.Context) error {
 	var result int
 	err := database.DB.QueryRow("select 1 from t_user where user_login = $1", u.Name).Scan(&result)
@@ -72,6 +75,7 @@ func addUser(u *models.UserAuth, c *gin.Context) error {
 
 }
 
+// Ищем пользователя
 func findUser(u *models.UserAuth, c *gin.Context) (int, error) {
 	var result int
 	err := database.DB.QueryRow("select 1 from t_user where user_login = $1", u.Name).Scan(&result)
@@ -104,6 +108,7 @@ func findUser(u *models.UserAuth, c *gin.Context) (int, error) {
 
 }
 
+// Создаём сессию
 func createSession(userId int, c *gin.Context) (string, error) {
 
 	key := time.Now().Format("2006-01-02 15:04:05")
@@ -129,6 +134,7 @@ func createSession(userId int, c *gin.Context) (string, error) {
 	return token, nil
 }
 
+// Получаем сессию
 func GetSession(token string) (*models.Session, error) {
 	var session models.Session
 
