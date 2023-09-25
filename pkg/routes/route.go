@@ -5,12 +5,16 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/tegehhat/helper/pkg/handlers"
+	"github.com/tegehhat/helper/pkg/middleware"
 )
 
 func GetRoute() *gin.Engine {
 	r := gin.Default()
 
 	r.POST("/login", handlers.Login)
+	r.POST("/registration", handlers.Registation)
+
+	r.Use(middleware.RequireAuth())
 
 	r.GET("/direction", handlers.GetDirection)
 	r.GET("/direction/:id", handlers.GetDirection)

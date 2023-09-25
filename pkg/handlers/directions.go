@@ -13,10 +13,7 @@ import (
 
 func GetDirection(c *gin.Context) {
 	id := c.Param("id")
-	idInt, err := strconv.Atoi(id)
-	if err != nil {
-		log.Println(err.Error())
-	}
+	idInt, _ := strconv.Atoi(id)
 
 	directionParams := models.DirectionGetParams{Id: idInt}
 
