@@ -17,6 +17,10 @@ import (
 
 func Logout(c *gin.Context) {
 	token := c.GetHeader("X-Token")
+	if token == "" {
+		c.JSON(http.StatusBadRequest, "Missing Token")
+		return
+	}
 
 	database.DB.Exec("update t_session_user set expires_at = now() WHERE token = $1", token)
 
