@@ -87,7 +87,10 @@ func findUser(u *models.UserAuth, c *gin.Context) (int, error) {
 	if err != nil {
 		// Если пользователь не найден - добавляем в таблицу сессий
 		if err == sql.ErrNoRows {
-			addUser(u)
+			err := addUser(u)
+			if err != nil {
+				return 0, err
+			}
 		}
 		return 0, err
 	}
