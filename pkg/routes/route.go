@@ -12,8 +12,8 @@ func GetRoute() *gin.Engine {
 	r := gin.Default()
 
 	//Авторизация
-	r.POST("/login", handlers.Login)
-	r.POST("/registration", handlers.Registation)
+	r.POST("/auth", handlers.Login)
+	r.DELETE("/auth", handlers.Logout)
 
 	//Проверка авторизации
 	r.Use(middleware.RequireAuth())

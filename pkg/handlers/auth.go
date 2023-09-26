@@ -15,18 +15,14 @@ import (
 	"github.com/tegehhat/helper/pkg/database"
 )
 
-// Регистрация /registration
-func Registation(c *gin.Context) {
-	var user models.UserAuth
-	json.NewDecoder(c.Request.Body).Decode(&user)
+func Logout(c *gin.Context) {
+	token := c.GetHeader("X-Token")
 
-	err := addUser(&user, c)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, err)
-		return
-	}
+	database.DB.Exec("update t_session_user set expires_at = now() WHERE token = $1", token)
 
-	c.JSON(http.StatusOK, user)
+	c.Request.Header.Del("X-Token")
+
+	c.JSON(http.StatusOK, "")
 }
 
 // Вход /login
@@ -51,7 +47,7 @@ func Login(c *gin.Context) {
 }
 
 // Добавляем пользователя
-func addUser(u *models.UserAuth, c *gin.Context) error {
+func addUser(u *models.UserAuth) error {
 	var result int
 	err := database.DB.QueryRow("select 1 from t_user where user_login = $1", u.Name).Scan(&result)
 	if err != nil {
@@ -85,6 +81,10 @@ func findUser(u *models.UserAuth, c *gin.Context) (int, error) {
 
 	err = database.DB.QueryRow("select 1 from t_session_user where user_name = $1", u.Name).Scan(&result)
 	if err != nil {
+		// Если пользователь не найден - добавляем в таблицу сессий
+		if err == sql.ErrNoRows {
+			addUser(u)
+		}
 		return 0, err
 	}
 
