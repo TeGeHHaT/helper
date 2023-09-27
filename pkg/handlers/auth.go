@@ -16,15 +16,18 @@ import (
 )
 
 func Logout(c *gin.Context) {
+	// Получаем текущий токен
 	token := c.GetHeader("X-Token")
 	if token == "" {
 		c.JSON(http.StatusBadRequest, "Missing Token")
 		return
 	}
 
-	database.DB.Exec("update t_session_user set expires_at = now() WHERE token = $1", token)
-
+	// Удаляем текущий токен
 	c.Request.Header.Del("X-Token")
+
+	// Ставим сессии дату окончания
+	database.DB.Exec("update t_session_user set expires_at = now() WHERE token = $1", token)
 
 	c.JSON(http.StatusOK, "")
 }
@@ -32,14 +35,17 @@ func Logout(c *gin.Context) {
 // Вход /login
 func Login(c *gin.Context) {
 	var user models.UserAuth
+	// Получаем из Body json user и пишем его в структуру user
 	json.NewDecoder(c.Request.Body).Decode(&user)
 
+	// Ищем user_id
 	userId, err := findUser(&user, c)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
 
+	// Создаём сессию
 	token, err := createSession(userId, c)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
@@ -47,6 +53,7 @@ func Login(c *gin.Context) {
 		return
 	}
 
+	// Вовзращаем токен
 	c.JSON(http.StatusOK, token)
 }
 
@@ -161,6 +168,7 @@ func GetSession(token string) (*models.Session, error) {
 	return &session, nil
 }
 
+// Хеширует пароль
 func passwordHash(password string) (string, error) {
 	if password == "" {
 		return "", errors.New("Incorrect password")
@@ -171,6 +179,7 @@ func passwordHash(password string) (string, error) {
 	return hex.EncodeToString(hasher.Sum(nil)), nil
 }
 
+// Создаёт хэш токен
 func tokenHash() string {
 	key := time.Now().Format("2006-01-02 15:04:05")
 	keyHash := md5.Sum([]byte(key))
