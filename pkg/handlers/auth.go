@@ -58,9 +58,10 @@ func addUser(u *models.UserAuth) error {
 		return err
 	}
 
-	hasher := md5.New()
-	hasher.Write([]byte(u.Password))
-	hashedInputPassword := hex.EncodeToString(hasher.Sum(nil))
+	hashedInputPassword, err := passwordHash(u.Password)
+	if err != nil {
+		return err
+	}
 
 	_, err = database.DB.Exec(
 		"INSERT INTO t_session_user (user_name, password) VALUES ($1, $2)",
@@ -95,9 +96,10 @@ func findUser(u *models.UserAuth, c *gin.Context) (int, error) {
 		return 0, err
 	}
 
-	hasher := md5.New()
-	hasher.Write([]byte(u.Password))
-	hashedInputPassword := hex.EncodeToString(hasher.Sum(nil))
+	hashedInputPassword, err := passwordHash(u.Password)
+	if err != nil {
+		return 0, err
+	}
 
 	var userHashedPassword string
 	var userId int
@@ -118,9 +120,7 @@ func findUser(u *models.UserAuth, c *gin.Context) (int, error) {
 // Создаём сессию
 func createSession(userId int, c *gin.Context) (string, error) {
 
-	key := time.Now().Format("2006-01-02 15:04:05")
-	keyHash := md5.Sum([]byte(key))
-	token := hex.EncodeToString(keyHash[:])
+	token := tokenHash()
 
 	c.Request.Header.Add("X-Token", token)
 
@@ -159,4 +159,20 @@ func GetSession(token string) (*models.Session, error) {
 	}
 
 	return &session, nil
+}
+
+func passwordHash(password string) (string, error) {
+	if password == "" {
+		return "", errors.New("Incorrect password")
+	}
+
+	hasher := md5.New()
+	hasher.Write([]byte(password))
+	return hex.EncodeToString(hasher.Sum(nil)), nil
+}
+
+func tokenHash() string {
+	key := time.Now().Format("2006-01-02 15:04:05")
+	keyHash := md5.Sum([]byte(key))
+	return hex.EncodeToString(keyHash[:])
 }
