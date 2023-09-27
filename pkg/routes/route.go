@@ -1,8 +1,6 @@
 package routes
 
 import (
-	"fmt"
-
 	"github.com/gin-gonic/gin"
 	"github.com/tegehhat/helper/pkg/handlers"
 	"github.com/tegehhat/helper/pkg/middleware"
@@ -27,8 +25,4 @@ func GetRoute() *gin.Engine {
 	//TODO: Все остальные справочники
 
 	return r
-}
-
-func testf(c *gin.Context) {
-	fmt.Print("test")
 }
